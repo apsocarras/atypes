@@ -15,7 +15,7 @@ beartype_package("atypes")
 
 
 def iter_modules() -> Iterator[pkgutil.ModuleInfo]:
-    pkg = importlib.import_module("atypes")
+    pkg = importlib.import_module("type_cellar")
     return pkgutil.walk_packages(pkg.__path__, pkg.__name__ + ".")
 
 

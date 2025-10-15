@@ -1,7 +1,7 @@
 [project]
-name = "atypes"
+name = "type-cellar"
 version = "0.1.0"
-description = "Add your description here"
+description = "Common types I use across projects."
 readme = "README.md"
 authors = [
     { name = "Alexander Socarras", email = "apsocarras@gmail.com" }
