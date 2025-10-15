@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping, Sequence
 from typing import (
@@ -123,39 +122,6 @@ class NotImplementSentinel(SentinelMeta):
         return self.__class__ == other.__class__
 
 
-class UUID_Str:
-    """Main purpose is to convert a uuid to string"""
-
-    def __init__(self, _uuid: uuid.UUID | None = None) -> None:
-        self._uuid: uuid.UUID = _uuid or uuid.uuid4()
-
-    @override
-    def __str__(self) -> str:  # hyphenated canonical form
-        return str(self._uuid)
-
-    @override
-    def __repr__(self) -> str:
-        return str(self._uuid)
-
-    @override
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, UUID_Str):
-            return self._uuid == other._uuid
-        if isinstance(other, uuid.UUID):
-            return self._uuid == other
-        if isinstance(other, str):
-            try:
-                other_uuid = uuid.UUID(hex=other)
-                return self._uuid == other_uuid
-            except Exception:
-                return False
-        raise NotImplementedError
-
-    @override
-    def __hash__(self) -> int:
-        return hash(self._uuid)
-
-
 class LoggerEvent(ABC):
     @property
     @abstractmethod
@@ -165,4 +131,13 @@ class LoggerEvent(ABC):
     def status(self) -> LiteralString | str: ...
     @property
     @abstractmethod
+    def details(self) -> Mapping[str, JSONType]: ...
+
+
+class LoggerEventProto(Protocol):
+    @property
+    def event(self) -> LiteralString | str: ...
+    @property
+    def status(self) -> LiteralString | str: ...
+    @property
     def details(self) -> Mapping[str, JSONType]: ...
