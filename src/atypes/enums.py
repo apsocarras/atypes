@@ -3,7 +3,6 @@ Enums are actually instantiated in code so they shouldn't be in the same file as
 """
 
 import logging
-import warnings
 from enum import Enum, auto
 from http import HTTPStatus
 from typing import Any
@@ -162,7 +161,7 @@ class SerialFormatType(BaseStrEnum):
         ```
         """
         if not isinstance(content_type, str):
-            warnings.warn(
+            logger.warning(
                 f"{cls.__name__} must be initialized with str (given: {type(content_type)}). Assigning UNKNOWN."
             )
             return cls(cls.UNKNOWN)
@@ -185,6 +184,17 @@ class SerialFormatType(BaseStrEnum):
             return cls(normalized_media_type)
 
         return cls(cls.UNKNOWN)
+
+
+class HttpMethod(BaseStrEnum):
+    GET = auto()
+    POST = auto()
+    PUT = auto()
+    DELETE = auto()
+    PATCH = auto()
+    HEAD = auto()
+    OPTIONS = auto()
+    UNKNOWN = auto
 
 
 if __name__ == "__main__":
