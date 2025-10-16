@@ -16,7 +16,7 @@ from typing import (
 )
 
 import useful_types as use
-from typing_extensions import LiteralString, Sentinel, override
+from typing_extensions import LiteralString, Self, Sentinel, override
 
 if TYPE_CHECKING:
     from .wrappers import HtmlBytes, JsonBytes, OtherBytes
@@ -87,12 +87,16 @@ class SentinelMeta(ABC, Sentinel):
     @abstractmethod
     def __bool__(self) -> Literal[True] | Literal[False]: ...
 
+    @classmethod
+    def make(cls) -> Self:
+        return cls(cls.value())
+
 
 class OmittedDefaultSentinel(SentinelMeta):
     @staticmethod
     @override
-    def value() -> Literal["omitted"]:  # noqa: F821
-        return "omitted"
+    def value() -> Literal["OMITTED"]:  # noqa: F821
+        return "OMITTED"
 
     @override
     def __str__(self) -> str:
@@ -106,8 +110,8 @@ class OmittedDefaultSentinel(SentinelMeta):
 class NotImplementSentinel(SentinelMeta):
     @staticmethod
     @override
-    def value() -> Literal["not-yet-implemented"]:  # noqa: F821
-        return "not-yet-implemented"
+    def value() -> Literal["NOT-IMPLEMENTED"]:  # noqa: F821
+        return "NOT-IMPLEMENTED"
 
     @override
     def __str__(self) -> str:
