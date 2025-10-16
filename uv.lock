@@ -25,12 +25,35 @@ wheels = [
 ]
 
 [[package]]
+name = "attrs"
+version = "25.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6b/5c/685e6633917e101e5dcb62b9dd76946cbb57c26e133bae9e0cd36033c0a9/attrs-25.4.0.tar.gz", hash = "sha256:16d5969b87f0859ef33a48b35d55ac1be6e42ae49d5e853b597db70c35c57e11", size = 934251 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3a/2a/7cc015f5b9f5db42b7d48157e23356022889fc354a2813c15934b7cb5c0e/attrs-25.4.0-py3-none-any.whl", hash = "sha256:adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373", size = 67615 },
+]
+
+[[package]]
 name = "beartype"
 version = "0.22.2"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/04/96/43ed27f27127155f24f5cf85df0c27fd2ac2ab67d94cecc8f76933f91679/beartype-0.22.2.tar.gz", hash = "sha256:ff3a7df26af8d15fa87f97934f0f6d41bbdadca971c410819104998dd26013d2", size = 1574491 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/96/2a/a4773109619010192e72f48e95165b14790413a51f513c879c8d63f67e17/beartype-0.22.2-py3-none-any.whl", hash = "sha256:12077afe3528eba5c5b801f816712f7ff06f6da5509994c79561e29b48bcedb8", size = 1317280 },
+]
+
+[[package]]
+name = "cattrs"
+version = "25.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/00/2432bb2d445b39b5407f0a90e01b9a271475eea7caf913d7a86bcb956385/cattrs-25.3.0.tar.gz", hash = "sha256:1ac88d9e5eda10436c4517e390a4142d88638fe682c436c93db7ce4a277b884a", size = 509321 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d8/2b/a40e1488fdfa02d3f9a653a61a5935ea08b3c2225ee818db6a76c7ba9695/cattrs-25.3.0-py3-none-any.whl", hash = "sha256:9896e84e0a5bf723bc7b4b68f4481785367ce07a8a02e7e9ee6eb2819bc306ff", size = 70738 },
 ]
 
 [[package]]
@@ -349,6 +372,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/83/f8/51569ac65d696c8ecbee95938f89d4abf00f47d58d48f6fbabfe8f0baefe/nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe", size = 7418 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/c4/c2971a3ba4c6103a3d10c4b0f24f461ddc027f0f09763220cf35ca1401b3/nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c", size = 5195 },
+]
+
+[[package]]
+name = "nobeartype"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beartype" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/66/e1/5a2e6ef5cac8ebcc058f7ec5d4f72fbff23a1a853ffa49c8de13cccc0320/nobeartype-0.1.1.tar.gz", hash = "sha256:2b166892bcf905a9b5c46160ed0416efd777cf5d292ef88114dfbe115b523863", size = 14708 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/52/cccc0f83ba1841c76819b728897393105bea753c1537960c7d24a3374de1/nobeartype-0.1.1-py3-none-any.whl", hash = "sha256:047b44d6ce67ef74972cc655e5a136eb325c93af966ba7e62a764ba5240f2319", size = 3220 },
 ]
 
 [[package]]
@@ -693,6 +729,9 @@ name = "type-cellar"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "attrs" },
+    { name = "cattrs" },
+    { name = "nobeartype" },
     { name = "typing-extensions" },
     { name = "useful-types" },
 ]
@@ -708,6 +747,9 @@ test = [
 
 [package.metadata]
 requires-dist = [
+    { name = "attrs", specifier = ">=25.4.0" },
+    { name = "cattrs", specifier = ">=25.3.0" },
+    { name = "nobeartype", specifier = ">=0.1.1" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
     { name = "useful-types", specifier = ">=0.2.1" },
 ]
