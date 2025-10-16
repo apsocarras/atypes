@@ -1,3 +1,5 @@
+from nobeartype import NoBearType
+
 from ._types import (
     HasHeaders,
     HasHeadersAndArgs,
@@ -6,6 +8,7 @@ from ._types import (
     JSONScalar,
     JSONType,
     LoggerEvent,
+    LoggerEventProto,
     NotImplementSentinel,
     OmittedDefaultSentinel,
     SentinelMeta,
@@ -25,6 +28,10 @@ from .wrappers import (
     OtherBytes,
 )
 
+_nobeartype = NoBearType()
+_OMITTED_DEFAULT = OmittedDefaultSentinel.make()
+_NOT_IMPLEMENTED = NotImplementSentinel.make()
+
 __all__ = [
     "JSONScalar",
     "JSONType",
@@ -37,6 +44,7 @@ __all__ = [
     "OmittedDefaultSentinel",
     "NotImplementSentinel",
     "LoggerEvent",
+    "LoggerEventProto",
     "ByteWrapperProto",
     "JsonBytes",
     "HtmlBytes",
