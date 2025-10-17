@@ -9,7 +9,7 @@ from _collections_abc import dict_items, dict_keys, dict_values
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping
 from functools import cached_property
-from typing import Any, Literal, NewType, Protocol, TypeVar
+from typing import Any, ClassVar, Literal, NewType, Protocol, TypeVar
 
 from typing_extensions import Sentinel, override
 
@@ -150,15 +150,6 @@ class VersionStampedName(ABC):
     @abstractmethod
     def raw(self) -> str: ...
 
-    @property
-    @abstractmethod
-    def full_table_id(self) -> str: ...
-
-    @abstractmethod
-    @override
-    def __str__(self) -> str:
-        return self.full_table_id
-
     @cached_property
     def stamped(self) -> str:
         return self.stamp(self.raw)
@@ -168,12 +159,12 @@ class VersionStampedName(ABC):
         """(Does roundtrip on raw with self.stamped())"""
         return self.unstamp(self.stamped)
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def stamp(cls, name: str) -> str: ...
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def unstamp(cls, name: str) -> str: ...
 
     @abstractmethod
@@ -201,6 +192,17 @@ class VersionStampedName(ABC):
 
         if not _valid_roundtrip():
             raise VersionStampError(info=error_args)
+
+
+class VersionStampedTableName(VersionStampedName, ABC):
+    @property
+    @abstractmethod
+    def full_table_id(self) -> str: ...
+
+    @override
+    @abstractmethod
+    def __str__(self) -> str:
+        return self.full_table_id
 
 
 _T = TypeVar("_T", bound=HasTableInfoProto)
@@ -247,7 +249,7 @@ def _utc_numeric_version_cleaner(table_name: str) -> str | Sentinel:
     return table_name[:idx]
 
 
-class UtcVersionStampedName(VersionStampedName):
+class UtcVersionStampedTableName(VersionStampedTableName):
     """Stamp a name with a UTC datetime string suffix"""
 
     def __init__(
@@ -284,6 +286,51 @@ class UtcVersionStampedName(VersionStampedName):
     @classmethod
     def unstamp(cls, name: str) -> str:
         return str(_utc_numeric_version_cleaner(name))
+
+    @override
+    def _validate(self, *args: Any, **kwargs: Any) -> None:
+        return super()._validate(*args, **kwargs)
+
+
+class StagingTableName(VersionStampedTableName):
+    _default_suffix: ClassVar[str] = "staging"
+
+    def __init__(
+        self,
+        table_info: HasTableInfoProto,
+        staging_suffix: str | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self._table: HasTableInfoProto = table_info
+        self._suffix: str = staging_suffix or self._default_suffix
+        super().__init__(*args, **kwargs)
+
+    @override
+    def __str__(self) -> str:
+        return super().__str__()
+
+    @property
+    @override
+    def full_table_id(self) -> str:
+        """Render the full base table id"""
+
+        return self._table.full_table_id
+
+    @property
+    @override
+    def raw(self) -> str:
+        return self.full_table_id
+
+    @override
+    @classmethod
+    def stamp(cls, name: str) -> str:
+        return f"{name}_{cls._default_suffix}"
+
+    @override
+    @classmethod
+    def unstamp(cls, name: str) -> str:
+        return name.removesuffix(cls._default_suffix)
 
     @override
     def _validate(self, *args: Any, **kwargs: Any) -> None:
