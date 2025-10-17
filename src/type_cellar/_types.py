@@ -16,7 +16,7 @@ from typing import (
 )
 
 import useful_types as use
-from typing_extensions import LiteralString, Self, Sentinel, override
+from typing_extensions import LiteralString, Self, Sentinel, TypedDict, override
 
 if TYPE_CHECKING:
     from .wrappers import HtmlBytes, JsonBytes, OtherBytes
@@ -145,3 +145,26 @@ class LoggerEventProto(Protocol):
     def status(self) -> LiteralString | str: ...
     @property
     def details(self) -> Mapping[str, JSONType]: ...
+
+
+class _VersionStampErrorArgs(TypedDict):
+    stamped_name: str
+    raw_name: str
+    unstamped_name: str
+
+
+class _TableInfoKwargs(TypedDict):
+    project_id: str
+    dataset_id: str
+    table_id: str
+
+
+class HasTableInfoProto(Protocol):
+    @property
+    def project_id(self) -> str: ...
+    @property
+    def dataset_id(self) -> str: ...
+    @property
+    def table_id(self) -> str: ...
+    @property
+    def full_table_id(self) -> str: ...
