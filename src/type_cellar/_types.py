@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping, MutableMapping, Sequence
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
     Literal,
     Protocol,
@@ -303,3 +304,11 @@ class HTTPXResponseProto(Protocol):
     def json(self) -> Any: ...
     def iter_bytes(self) -> Iterator[bytes]: ...
     def raise_for_status(self) -> None: ...
+
+
+ExternalRequest: TypeAlias = Annotated[
+    FlaskRequestProto | HTTPXRequestProto, "Request from 3rd-party library"
+]
+ExternalResponse: TypeAlias = Annotated[
+    FlaskResponseProto | HTTPXResponseProto, "Response from 3rd-party library"
+]
