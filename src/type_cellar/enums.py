@@ -3,9 +3,10 @@ Enums are actually instantiated in code so they shouldn't be in the same file as
 """
 
 import logging
+from collections.abc import Mapping
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any
+from typing import Any, Literal, TypeAlias
 
 from typing_extensions import Self, override
 
@@ -82,6 +83,9 @@ class SuccessStatus(BaseStrEnum):
         return SuccessStatus.UNKNOWN
 
 
+_ContentHeaderKey: TypeAlias = Literal["content-type"] | Literal["accept"]
+
+
 class SerialFormatType(BaseStrEnum):
     UNKNOWN = auto()
 
@@ -132,6 +136,20 @@ class SerialFormatType(BaseStrEnum):
     @override
     def _missing_(cls, value: object) -> Self:
         return cls.normalize(value)
+
+    @classmethod
+    def from_header(
+        cls, header: Mapping[str, str], header_key: _ContentHeaderKey = "content-type"
+    ):
+        try:
+            serial_format: SerialFormatType = SerialFormatType.normalize(
+                header[header_key]
+            )
+            return serial_format
+        except (KeyError, ValueError):
+            serial_format = SerialFormatType.UNKNOWN
+
+        return serial_format
 
     @classmethod
     def normalize(cls, content_type: object) -> Self:
