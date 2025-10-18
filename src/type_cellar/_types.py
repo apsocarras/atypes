@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterator, Mapping, MutableMapping, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -168,3 +168,138 @@ class HasTableInfoProto(Protocol):
     def table_id(self) -> str: ...
     @property
     def full_table_id(self) -> str: ...
+
+
+@runtime_checkable
+class FlaskRequestProto(Protocol):
+    """
+    Structural subset of flask.Request (Werkzeug Request) with the features most apps rely on.
+    """
+
+    method: str
+    url: str
+    path: str
+    headers: Mapping[str, str]
+    args: Mapping[str, str]  # query params (first value per key)
+    form: Mapping[str, str]  # form fields (first value per key)
+    files: Mapping[str, Any]  # e.g., werkzeug.datastructures.FileStorage
+    cookies: Mapping[str, str]
+    remote_addr: str | None
+    content_type: str | None
+    mimetype: str | None
+    # WSGI environ (read-only mapping in Flask)
+    environ: Mapping[str, Any]
+
+    @overload
+    def get_data(  # pyright: ignore[reportOverlappingOverload]
+        self,
+        cache: bool = True,
+        as_text: Literal[False] = False,
+        parse_form_data: bool = False,
+    ) -> bytes: ...
+    @overload
+    def get_data(
+        self,
+        cache: bool = True,
+        as_text: Literal[True] = ...,
+        parse_form_data: bool = False,
+    ) -> str: ...
+    def get_data(
+        self, cache: bool = True, as_text: bool = False, parse_form_data: bool = False
+    ) -> bytes | str: ...
+
+    def get_json(self, silent: bool = False, force: bool = False) -> Any | None: ...
+    @property
+    def is_json(self) -> bool: ...
+
+
+@runtime_checkable
+class FlaskResponseProto(Protocol):
+    """
+    Structural subset of flask.Response (Werkzeug Response).
+    """
+
+    status_code: int
+    headers: MutableMapping[str, str]
+    mimetype: str | None
+    content_type: str | None
+
+    # get_data(as_text=False) -> bytes | str
+    @overload
+    def get_data(  # pyright: ignore[reportOverlappingOverload]
+        self,
+        cache: bool = True,
+        as_text: Literal[False] = False,
+        parse_form_data: bool = False,
+    ) -> bytes: ...
+    @overload
+    def get_data(
+        self,
+        cache: bool = True,
+        as_text: Literal[True] = ...,
+        parse_form_data: bool = False,
+    ) -> str: ...
+    def get_data(
+        self, cache: bool = True, as_text: bool = False, parse_form_data: bool = False
+    ) -> bytes | str: ...
+
+    def set_data(self, data: bytes | str) -> None: ...
+
+    # Cookie helpers
+    def set_cookie(
+        self,
+        key: str,
+        value: str = "",
+        max_age: int | None = None,
+        expires: int | str | None = None,
+        path: str = "/",
+        domain: str | None = None,
+        secure: bool = False,
+        httponly: bool = False,
+        samesite: str | None = None,
+    ) -> None: ...
+    def delete_cookie(
+        self, key: str, path: str = "/", domain: str | None = None
+    ) -> None: ...
+
+
+class SupportsStr(Protocol):
+    @override
+    def __str__(self) -> str: ...
+
+
+UrlLike = str | SupportsStr
+
+
+@runtime_checkable
+class HTTPXRequestProto(Protocol):
+    """
+    Structural subset of httpx.Request.
+    """
+
+    method: str
+    url: UrlLike
+    headers: Mapping[str, str]
+    content: bytes | None
+
+    def copy(self) -> HTTPXRequestProto: ...
+
+
+@runtime_checkable
+class HTTPXResponseProto(Protocol):
+    """
+    Structural subset of httpx.Response.
+    """
+
+    status_code: int
+    headers: Mapping[str, str]
+    reason_phrase: str
+    url: UrlLike
+    request: HTTPXRequestProto
+
+    content: bytes
+    text: str
+
+    def json(self) -> Any: ...
+    def iter_bytes(self) -> Iterator[bytes]: ...
+    def raise_for_status(self) -> None: ...
