@@ -9,7 +9,14 @@ from _collections_abc import dict_items, dict_keys, dict_values
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping
 from functools import cached_property
-from typing import Any, ClassVar, Literal, NewType, Protocol, TypeVar
+from typing import (
+    Any,
+    ClassVar,
+    Literal,
+    NewType,
+    Protocol,
+    TypeVar,
+)
 
 from typing_extensions import Sentinel, override
 
@@ -35,6 +42,14 @@ class JsonBytes:
         self.raw: bytes = raw
         self.type: Literal[SerialFormatType.APPLICATION_JSON] = (
             SerialFormatType.APPLICATION_JSON
+        )
+
+
+class XMLBytes:
+    def __init__(self, raw: bytes) -> None:
+        self.raw: bytes = raw
+        self.type: Literal[SerialFormatType.APPLICATION_XML] = (
+            SerialFormatType.APPLICATION_XML
         )
 
 
