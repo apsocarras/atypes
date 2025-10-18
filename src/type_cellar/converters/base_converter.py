@@ -3,9 +3,10 @@
 from beartype.typing import Annotated, Any, Literal, get_args, get_origin
 from cattrs.converters import Converter
 
-from type_cellar import SentinelMeta
-from type_cellar.converters.attrs_converters import register_attrs_hooks
+from type_cellar.deduping import register_dedupe_hooks
 
+from .. import SentinelMeta
+from ..converters.attrs_converters import register_attrs_hooks
 from .datetimes import register_datetime_hooks
 from .enums import register_enum_hooks
 from .exceptions import register_exception_hooks
