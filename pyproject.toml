@@ -19,17 +19,46 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.ruff]
-target-version = "py310"
-
 [dependency-groups]
 dev = [
-    "ipykernel>=7.0.1",
+    "debugpy>=1.8.16",
+    "ipykernel>=6.30.1",
+    "mypy>=1.17.1",
+    "ruff>=0.12.11",
+    "deptry>=0.22.0",
+    "pre-commit>=4.3.0",
 ]
+
 test = [
-    "beartype>=0.22.2",
-    "pytest>=8.4.2",
+    "coverage>=7.10.6",
+    "pytest>=8.4.1",
+    "pytest-cov>=4.0.0",
+    "hypothesis>=6.139.1",
+    "hypothesis-jsonschema>=0.23.1",
+    "mimesis>=18.0.0",
+    "python-dotenv>=1.1.1",
 ]
+
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-gen-files>=0.5.0",
+    "mkdocs-literate-nav>=0.6.2",
+    "mkdocs-material>=9.6.18",
+    "mkdocs-section-index>=0.3.10",
+    "mkdocstrings>=0.30.0",
+    "mkdocstrings-python>=1.18.2",
+    "pygments>=2.19.2",
+    "pymdown-extensions>=10.16.1",
+]
+
+[tool.deptry]
+extend_exclude = [
+  ".venv/",
+  "deprecated/"
+]
+
+[tool.deptry.per_rule_ignores]
+DEP004 = ["docs", "tests"]
 
 
 [tool.mypy]
@@ -38,15 +67,124 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 disallow_any_generics = true
 no_implicit_reexport = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_any_unimported = true
+warn_return_any = true
+show_error_codes = true
+exclude = "^(libs/|deprecated/)"
+
+[[tool.mypy.overrides]]
+module = ["requests", "yaml"]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = [
+    "deprecated/", 
+    "libs/",
+    "_local/"
+]
+unsafe-fixes = true
+line-length = 88
+
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+quote-style = "double"
+## indent-style = "double"
+skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+    # pydocstyle 
+    "D"
+]
 ignore=[
-    # Don't name lambdas
-    "E731", 
-    ]
+    # LineTooLong
+    "E501",
+    # DoNotAssignLambda
+    "E731",
+    # Multi-line docstring summary should start at the first line
+    "D212",
+    # First line should end with a period, question mark, or exclamation point
+    "D415",
+    # Inits do not always need docstrings - class docstring is often enough
+    "D107",
+    # Spacing obsession
+    "D205", "D202"
+]
+future-annotations = true
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101", 
+    "S603", 
+    "D100", 
+    "D103", 
+    "D101", 
+    "D104", 
+    "I002", 
+    "D205", 
+    "D102"
+]
+
+#FIXME: remove these and the associated # noqa: F401 ignore directives post project generation
+# (ruff is having a hard time understanding the cookiecutter template and is removing 
+# unused imports on save, so I apply the F401 directive. but post generation it's not needed
+# for required imports)  
+
+"app.py" = ["RUF100"]
+"docs/**/*.py" = ["RUF100"]
+"src/**/*.py" = ["RUF100"]
+"utils/**/*.py" = ["RUF100"]
+"_cookie_features/**/*.py" = ["RUF100"]
+
+
+[tool.ruff.lint.isort]
+required-imports = [
+    "from __future__ import annotations",
+    "from type_cellar import SequenceNotStr as Sequence"
+]
+
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[tool.uv.workspace]
-members = ["foo"]
+ignore-decorators = [
+    "typing.overload", 
+    "typing_extensions.overload"
+]
