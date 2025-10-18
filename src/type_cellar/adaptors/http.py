@@ -25,6 +25,7 @@ from .._types import (
     FlaskRequestProto,
     FlaskResponseProto,
     HTTPXRequestProto,
+    HTTPXResponseProto,
 )
 from ..enums import HttpMethod, SerialFormatType
 from ..wrappers import HtmlBytes, JsonBytes, OtherBytes, XMLBytes
@@ -362,5 +363,79 @@ def from_werkzeug_response(
             construct_args["_body"] = construct_bytewrapper(resp)
             return cast(
                 SimpleHttpResponseAdaptor[FlaskResponseProto, _AnyBytes],
+                SimpleHttpResponseAdaptor(**construct_args),
+            )
+
+
+_S_RespHttpx: TypeAlias = SimpleHttpResponseAdaptor[_T_Resp, _T_ByteWrapper]
+
+
+@overload
+def from_httpx_response(
+    resp: HTTPXResponseProto, byte_t: type[JsonBytes]
+) -> _S_RespHttpx[HTTPXResponseProto, JsonBytes]: ...
+@overload
+def from_httpx_response(
+    resp: HTTPXResponseProto, byte_t: type[HtmlBytes]
+) -> _S_RespHttpx[HTTPXResponseProto, HtmlBytes]: ...
+@overload
+def from_httpx_response(
+    resp: HTTPXResponseProto, byte_t: type[XMLBytes]
+) -> _S_RespHttpx[HTTPXResponseProto, XMLBytes]: ...
+@overload
+def from_httpx_response(
+    resp: HTTPXResponseProto, byte_t: None
+) -> _S_RespHttpx[HTTPXResponseProto, _AnyBytes]: ...
+def from_httpx_response(
+    resp: HTTPXResponseProto,
+    byte_t: type[_T_ByteWrapper] | None = None,
+) -> (
+    SimpleHttpResponseAdaptor[HTTPXResponseProto, JsonBytes]
+    | SimpleHttpResponseAdaptor[HTTPXResponseProto, HtmlBytes]
+    | SimpleHttpResponseAdaptor[HTTPXResponseProto, XMLBytes]
+    | SimpleHttpResponseAdaptor[HTTPXResponseProto, _AnyBytes]
+):
+    try:
+        b: bytes = _extract_bytes(resp)
+    except NameError:
+        b = bytes(resp.content or b"")
+
+    def _safe_get_json() -> Any:
+        try:
+            return resp.json()
+        except Exception:
+            return None
+
+    construct_args = dict(
+        external=resp,
+        _status=resp.status_code,
+        _headers={k: v for k, v in resp.headers.items()},
+        _get_json=_safe_get_json,
+    )
+
+    match byte_t:
+        case _ if byte_t is JsonBytes:
+            construct_args["_body"] = JsonBytes(b)  # pyright: ignore[reportArgumentType]
+            return cast(
+                SimpleHttpResponseAdaptor[HTTPXResponseProto, JsonBytes],
+                SimpleHttpResponseAdaptor(**construct_args),
+            )
+        case _ if byte_t is HtmlBytes:
+            construct_args["_body"] = HtmlBytes(b)  # pyright: ignore[reportArgumentType]
+            return cast(
+                SimpleHttpResponseAdaptor[HTTPXResponseProto, HtmlBytes],
+                SimpleHttpResponseAdaptor(**construct_args),
+            )
+        case _ if byte_t is XMLBytes:
+            construct_args["_body"] = XMLBytes(b)  # pyright: ignore[reportArgumentType]
+            return cast(
+                SimpleHttpResponseAdaptor[HTTPXResponseProto, XMLBytes],
+                SimpleHttpResponseAdaptor(**construct_args),
+            )
+        case _:
+            body_wrapped = construct_bytewrapper(resp)
+            construct_args["_body"] = body_wrapped  # pyright: ignore[reportArgumentType]
+            return cast(
+                SimpleHttpResponseAdaptor[HTTPXResponseProto, _AnyBytes],
                 SimpleHttpResponseAdaptor(**construct_args),
             )
