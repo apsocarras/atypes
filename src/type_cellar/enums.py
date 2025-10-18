@@ -194,7 +194,7 @@ class HttpMethod(BaseStrEnum):
     PATCH = auto()
     HEAD = auto()
     OPTIONS = auto()
-    UNKNOWN = auto
+    UNKNOWN = auto()
 
 
 if __name__ == "__main__":
