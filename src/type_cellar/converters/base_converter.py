@@ -1,4 +1,5 @@
 """Exposes the default converter for this package"""
+from __future__ import annotations
 
 from beartype.typing import Annotated, Any, Literal, get_args, get_origin
 from cattrs.converters import Converter
@@ -34,7 +35,7 @@ class ModelConverter(Converter):
         self,
         obj: Any,
         destruct: bool = True,
-        strategy: Literal["drop_none", "replace_none_null"] = "drop_none",
+        strategy: Literal[drop_none, replace_none_null] = "drop_none",
     ) -> dict[str, str]:
         """
         Wraps the converter's normal operations with another conversion of `None`.

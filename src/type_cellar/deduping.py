@@ -1,9 +1,12 @@
 """Utility class for creating de-duplication keys (e.g. for Pub/Sub)"""
 
+from __future__ import annotations
+
 import hashlib
 import json
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Literal, TypeVar
+from collections.abc import Callable
+from typing import Any, Literal, TypeVar
 
 from cattrs import Converter
 from typing_extensions import NotRequired, TypedDict, Unpack, override
@@ -30,12 +33,10 @@ def hash_bytes(b: bytes, /) -> str:
 
 
 class DedupeKeyMeta(ABC):
-    """
-    Natural key = key provided at init. Otherwise will hash payload along with provided salient attributes
-    """
+    """Natural key = key provided at init. Otherwise will hash payload along with provided salient attributes"""
 
     def __init__(self, **kwargs: Unpack[SalientAttributes]) -> None:
-        natural_key: str | None = kwargs.get("natural_key", None)
+        natural_key: str | None = kwargs.get("natural_key")
         if natural_key:
             self._key: str = self.underlying(natural_key)
         else:
@@ -55,16 +56,12 @@ class DedupeKeyMeta(ABC):
     @classmethod
     @abstractmethod
     def prefix(cls) -> str:
-        """
-        NOTE: Includes prefix for use in firebase document stores.
-        """
+        """NOTE: Includes prefix for use in firebase document stores."""
         ...
 
     @override
     def __str__(self) -> str:
-        """
-        NOTE: Includes prefix for use in firebase document stores.
-        """
+        """NOTE: Includes prefix for use in firebase document stores."""
         return f"{self.prefix()}:{self._key}"
 
     @classmethod
@@ -91,9 +88,7 @@ class DedupeKeyMeta(ABC):
 
     @override
     def __eq__(self, value: object, /) -> bool:
-        """
-        NOTE: Does NOT consider the prefix
-        """
+        """NOTE: Does NOT consider the prefix"""
         if isinstance(value, DedupeKeyMeta):
             return self.key == value.key
         return False

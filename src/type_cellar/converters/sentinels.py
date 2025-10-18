@@ -1,4 +1,7 @@
-from typing import Any, Callable, Literal, TypeVar
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any, Literal, TypeVar
 
 from cattrs import Converter
 

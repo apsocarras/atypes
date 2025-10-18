@@ -22,9 +22,7 @@ def _iter_by_metadata(cls: type) -> Iterable[Any]:
     if not attr.has(cls):
         raise TypeError(f"{cls} is not an attrs class")
     for f in attrs.fields(cls):
-        if f.metadata.get("omit", False):
-            continue
-        elif f.metadata.get("omit_if_default", False) and f.value == attr.NOTHING:
+        if f.metadata.get("omit", False) or (f.metadata.get("omit_if_default", False) and f.value == attr.NOTHING):
             continue
         yield f
 

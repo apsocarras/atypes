@@ -1,6 +1,5 @@
-"""
-Enums are actually instantiated in code so they shouldn't be in the same file as non-instantiated types
-"""
+"""Enums are actually instantiated in code so they shouldn't be in the same file as non-instantiated types"""
+from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
@@ -36,9 +35,7 @@ class BaseStrEnum(Enum):
 
 
 class SuccessStatus(BaseStrEnum):
-    """
-    Using literals instead of auto() for type safety
-    """
+    """Using literals instead of auto() for type safety"""
 
     SUCCESS = auto()
     ERROR = auto()
@@ -63,7 +60,7 @@ class SuccessStatus(BaseStrEnum):
     @staticmethod
     def from_http_response_status(
         status: HTTPStatus | int,
-    ) -> "SuccessStatus":
+    ) -> SuccessStatus:
         s = int(status)
 
         if s < 400:

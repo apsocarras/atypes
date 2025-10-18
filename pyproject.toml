@@ -178,7 +178,6 @@ unfixable = []
 [tool.ruff.lint.isort]
 required-imports = [
     "from __future__ import annotations",
-    "from type_cellar import SequenceNotStr as Sequence"
 ]
 
 

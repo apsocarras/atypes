@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from abc import ABC
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from http import HTTPStatus
 from typing import (
     Any,
-    Callable,
     Generic,
     Protocol,
     TypeAlias,
@@ -209,16 +208,16 @@ def from_werkzeug_request(
 ):
     b: bytes = _extract_bytes(req)
 
-    construct_args = dict(
-        external=req,
-        _method=_coerce_http_method(req.method),
-        _url=req.url,
-        _path=req.path,
-        _args={k: v for k, v in req.args.items()},
-        _headers={k: v for k, v in req.headers.items()},
-        _remote_addr=getattr(req, "remote_addr", None),
-        _get_json=req.get_json,
-    )
+    construct_args = {
+        "external": req,
+        "_method": _coerce_http_method(req.method),
+        "_url": req.url,
+        "_path": req.path,
+        "_args": dict(req.args.items()),
+        "_headers": dict(req.headers.items()),
+        "_remote_addr": getattr(req, "remote_addr", None),
+        "_get_json": req.get_json,
+    }
     ## If type is known and passed in signature, narrow
     match byte_t:
         case _ if byte_t is JsonBytes:
@@ -250,9 +249,7 @@ def from_werkzeug_request(
 
 @runtime_checkable
 class HttpResponseAdaptor(Protocol, Generic[_T_ByteWrapper]):
-    """
-    Normalized view over any 3rd-party HTTP response type.
-    """
+    """Normalized view over any 3rd-party HTTP response type."""
 
     @property
     def status(self) -> HTTPStatus: ...
@@ -270,9 +267,7 @@ class HttpResponseAdaptor(Protocol, Generic[_T_ByteWrapper]):
 class SimpleHttpResponseAdaptor(
     _BodyHeaders[_T_ByteWrapper], Generic[_T_Resp, _T_ByteWrapper]
 ):
-    """
-    A concrete, framework-agnostic response adaptor.
-    """
+    """A concrete, framework-agnostic response adaptor."""
 
     external: _T_Resp
     _status: HTTPStatus
@@ -330,14 +325,14 @@ def from_werkzeug_response(
                 return None
         return None
 
-    construct_args = dict(
-        external=resp,
-        _status=getattr(
+    construct_args = {
+        "external": resp,
+        "_status": getattr(
             resp, "status_code", None
         ),  # keep int; adaptor can coerce to HTTPStatus
-        _headers={k: v for k, v in getattr(resp, "headers", {}).items()},
-        _get_json=_safe_get_json,
-    )
+        "_headers": dict(getattr(resp, "headers", {}).items()),
+        "_get_json": _safe_get_json,
+    }
 
     match byte_t:
         case _ if byte_t is JsonBytes:
@@ -406,12 +401,12 @@ def from_httpx_response(
         except Exception:
             return None
 
-    construct_args = dict(
-        external=resp,
-        _status=resp.status_code,
-        _headers={k: v for k, v in resp.headers.items()},
-        _get_json=_safe_get_json,
-    )
+    construct_args = {
+        "external": resp,
+        "_status": resp.status_code,
+        "_headers": dict(resp.headers.items()),
+        "_get_json": _safe_get_json,
+    }
 
     match byte_t:
         case _ if byte_t is JsonBytes:

@@ -96,7 +96,7 @@ class MapString(Mapping[_T_K, _T_V]):
     @override
     def __repr__(self) -> str:
         # Represent the stringified mapping
-        items = ", ".join(f"{str(k)}: {str(v)}" for k, v in self._data.items())
+        items = ", ".join(f"{k!s}: {v!s}" for k, v in self._data.items())
         return f"{self.__class__.__name__}({{{items}}})"
 
     @override

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 
 import attr
@@ -13,9 +15,7 @@ def get_unstructure_attrs_factory(
     def unstructure_attrs_factory(
         cls: type[Any],
     ) -> Callable[..., dict[Any, Any]]:
-        """
-        Returns a function that converts an instance of a given attrs object into a dict
-        """
+        """Returns a function that converts an instance of a given attrs object into a dict"""
 
         def _unstructure_attrs(obj: Any) -> dict[Any, Any]:
             result: dict[Any, Any] = {}

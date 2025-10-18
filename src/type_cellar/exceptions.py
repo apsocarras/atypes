@@ -1,4 +1,6 @@
 # pyright: reportPrivateUsage=false
+from __future__ import annotations
+
 from typing import Any
 
 from ._types import SequenceNotStr as Sequence

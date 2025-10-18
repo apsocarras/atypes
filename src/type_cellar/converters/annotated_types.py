@@ -1,5 +1,9 @@
+from __future__ import annotations
+
+from typing import Annotated
+
 from beartype.typing import get_args, get_origin
-from typing_extensions import Annotated, Any
+from typing_extensions import Any
 
 
 # @cbase.register_structure_hook

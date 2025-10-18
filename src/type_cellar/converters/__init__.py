@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import cattrs
 
 from .base_converter import get_converter

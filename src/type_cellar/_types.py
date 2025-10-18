@@ -47,9 +47,7 @@ class HasHeadersBody(HasHeaders, Protocol):
 
 
 class HasHeadersAndArgs(HasHeaders, Protocol):
-    """
-    Protocol representing a flask-like object with HTTP headers and url params (args)
-    """
+    """Protocol representing a flask-like object with HTTP headers and url params (args)"""
 
     @property
     def args(self) -> Mapping[str, Any]: ...
@@ -173,9 +171,7 @@ class HasTableInfoProto(Protocol):
 
 @runtime_checkable
 class FlaskRequestProto(Protocol):
-    """
-    Structural subset of flask.Request (Werkzeug Request) with the features most apps rely on.
-    """
+    """Structural subset of flask.Request (Werkzeug Request) with the features most apps rely on."""
 
     method: str
     url: str
@@ -216,9 +212,7 @@ class FlaskRequestProto(Protocol):
 
 @runtime_checkable
 class FlaskResponseProto(Protocol):
-    """
-    Structural subset of flask.Response (Werkzeug Response).
-    """
+    """Structural subset of flask.Response (Werkzeug Response)."""
 
     status_code: int
     headers: MutableMapping[str, str]
@@ -274,9 +268,7 @@ UrlLike = str | SupportsStr
 
 @runtime_checkable
 class HTTPXRequestProto(Protocol):
-    """
-    Structural subset of httpx.Request.
-    """
+    """Structural subset of httpx.Request."""
 
     method: str
     url: UrlLike
@@ -288,9 +280,7 @@ class HTTPXRequestProto(Protocol):
 
 @runtime_checkable
 class HTTPXResponseProto(Protocol):
-    """
-    Structural subset of httpx.Response.
-    """
+    """Structural subset of httpx.Response."""
 
     status_code: int
     headers: Mapping[str, str]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import cattrs
 
 from type_cellar.converters._raise_util import raise_type_error
