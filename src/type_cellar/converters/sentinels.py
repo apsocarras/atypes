@@ -66,16 +66,18 @@ def register_sentinel_hooks(conv: Converter) -> None:
     # --- unstructure via sentinel factory ---
 
     >>> class DummySentinel(SentinelMeta):
-    ...    @override
-    ...    def __str__(self):
-    ...        return self.value()
-    ...    @staticmethod
-    ...    @override
-    ...    def value() -> str:
-    ...        return "DUMMY"
-    ...    @override
-    ...    def __bool__(self) -> Literal[False]:
-    ...        return False
+    ...     @override
+    ...     def __str__(self):
+    ...         return self.value()
+    ...
+    ...     @staticmethod
+    ...     @override
+    ...     def value() -> str:
+    ...         return "DUMMY"
+    ...
+    ...     @override
+    ...     def __bool__(self) -> Literal[False]:
+    ...         return False
 
     >>> conv.unstructure(DummySentinel())
     'DUMMY'
@@ -85,7 +87,9 @@ def register_sentinel_hooks(conv: Converter) -> None:
     True
     >>> conv.structure("null", NotImplementSentinel) is None
     True
-    >>> conv.structure(NotImplementSentinel.value(), NotImplementSentinel) is NOT_IMPLEMENTED
+    >>> conv.structure(
+    ...     NotImplementSentinel.value(), NotImplementSentinel
+    ... ) is NOT_IMPLEMENTED
     True
     >>> conv.structure(NotImplementSentinel(), NotImplementSentinel) is NOT_IMPLEMENTED
     True
@@ -93,7 +97,9 @@ def register_sentinel_hooks(conv: Converter) -> None:
     True
 
     # --- OmittedDefaultSentinel ---
-    >>> conv.structure(OmittedDefaultSentinel.value(), OmittedDefaultSentinel) is OMITTED_DEFAULT
+    >>> conv.structure(
+    ...     OmittedDefaultSentinel.value(), OmittedDefaultSentinel
+    ... ) is OMITTED_DEFAULT
     True
 
     # --- OptionalClientId ---
@@ -103,7 +109,9 @@ def register_sentinel_hooks(conv: Converter) -> None:
     True
     >>> conv.structure("abc123", OptionalClientId)
     'abc123'
-    >>> conv.structure(NotImplementSentinel.value(), OptionalClientId) is NOT_IMPLEMENTED
+    >>> conv.structure(
+    ...     NotImplementSentinel.value(), OptionalClientId
+    ... ) is NOT_IMPLEMENTED
     True
     >>> conv.structure(NotImplementSentinel(), OptionalClientId) is NOT_IMPLEMENTED
     True
@@ -111,7 +119,9 @@ def register_sentinel_hooks(conv: Converter) -> None:
     True
 
     # --- OmittedDefaultSentinel | str ---
-    >>> conv.structure(OmittedDefaultSentinel.value(), OmittedDefaultSentinel | str) is OMITTED_DEFAULT
+    >>> conv.structure(
+    ...     OmittedDefaultSentinel.value(), OmittedDefaultSentinel | str
+    ... ) is OMITTED_DEFAULT
     True
     >>> conv.structure("some-id", OmittedDefaultSentinel | str)
     'some-id'

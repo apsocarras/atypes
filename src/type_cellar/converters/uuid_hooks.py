@@ -29,10 +29,10 @@ def make_uuid_str(value, _: type[UUID_Str]) -> UUID_Str:
     >>> from wck_python_utils.types._types import UUID_Str
 
     >>> u = uuid.uuid4()
-    >>> if (make_uuid_str(str(u), UUID_Str) != UUID_Str(u)):
+    >>> if make_uuid_str(str(u), UUID_Str) != UUID_Str(u):
     ...     print(str(u), UUID_Str(u), make_uuid_str(str(u), UUID_Str))
 
-    >>> if (make_uuid_str(u, UUID_Str) != UUID_Str(u)):
+    >>> if make_uuid_str(u, UUID_Str) != UUID_Str(u):
     ...     print(u, UUID_Str(u), make_uuid_str(u, UUID_Str))
 
     >>> make_uuid_str(123, UUID_Str)
@@ -63,7 +63,7 @@ def uuid_from_hex(value, _: type[uuid.UUID]) -> uuid.UUID:
     """
     >>> import uuid
     >>> u = uuid.uuid4()
-    >>> if (uuid_from_hex(str(u), uuid.UUID) != u):
+    >>> if uuid_from_hex(str(u), uuid.UUID) != u:
     ...     print(str(u), u)
     >>> uuid_from_hex(str(u), uuid.UUID) == u
     True

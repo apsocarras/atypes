@@ -1,4 +1,5 @@
 """Enums are actually instantiated in code so they shouldn't be in the same file as non-instantiated types"""
+
 from __future__ import annotations
 
 import logging
