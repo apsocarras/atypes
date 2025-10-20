@@ -1,5 +1,8 @@
 """Exposes the default converter for this package"""
+
 from __future__ import annotations
+
+from typing import TypeAlias
 
 from beartype.typing import Annotated, Any, Literal, get_args, get_origin
 from cattrs.converters import Converter
@@ -16,6 +19,8 @@ from .json_ import (
 )
 from .sentinels import register_sentinel_hooks
 from .uuid_hooks import register_uuid_hooks
+
+DropStrategy: TypeAlias = Literal["drop_none", "replace_none_null"]  # noqa: F821
 
 
 class ModelConverter(Converter):
@@ -35,7 +40,7 @@ class ModelConverter(Converter):
         self,
         obj: Any,
         destruct: bool = True,
-        strategy: Literal[drop_none, replace_none_null] = "drop_none",
+        strategy: DropStrategy = "drop_none",
     ) -> dict[str, str]:
         """
         Wraps the converter's normal operations with another conversion of `None`.
