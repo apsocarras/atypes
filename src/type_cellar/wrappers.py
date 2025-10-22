@@ -163,7 +163,7 @@ class VersionStampedName(ABC):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._validate()
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     @property
     @abstractmethod
