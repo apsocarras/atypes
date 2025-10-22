@@ -15,10 +15,14 @@ from typing import (
     Literal,
     NewType,
     Protocol,
+    TypedDict,
     TypeVar,
 )
 
-from typing_extensions import Sentinel, override
+import attr
+from typing_extensions import Sentinel, Unpack, override
+
+from type_cellar._types import HasTableInfoProto
 
 from ._types import (
     HasTableInfoProto,
@@ -26,7 +30,7 @@ from ._types import (
     _VersionStampErrorArgs,
 )
 from .enums import SerialFormatType
-from .exceptions import VersionStampError
+from .exceptions import TableIdentifierError, VersionStampError
 
 MicroSeconds = NewType("MicroSeconds", int)
 MiliSeconds = NewType("MiliSeconds", int)
@@ -209,10 +213,65 @@ class VersionStampedName(ABC):
             raise VersionStampError(info=error_args)
 
 
+@attr.define
+class TableInfo:
+    """Simple wrapper for a fully-qualified bigquery table name"""
+
+    project_id: str
+    dataset_id: str
+    table_id: str
+
+    @property
+    def full_table_id(self) -> str:
+        return f"{self.project_id}.{self.dataset_id}.{self.table_id}"
+
+
+class _VersionStampedTableIdKwargs(TypedDict):
+    table_info: HasTableInfoProto | None
+    project_id: str | None
+    dataset_id: str | None
+    table_id: str | None
+    full_table_name: str | None
+
+
 class VersionStampedTableName(VersionStampedName, ABC):
+    """Enforce roundtrip convertibility between base version and alternate version"""
+
+    def __init__(
+        self,
+        *args: Any,
+        **kwargs: Unpack[_VersionStampedTableIdKwargs],
+    ) -> None:
+        table_info = kwargs.get("table_info")
+        project_id = kwargs.get("project_id")
+        dataset_id = kwargs.get("dataset_id")
+        table_id = kwargs.get("table_id")
+        full_table_name = kwargs.get("full_table_name")
+
+        self._table: HasTableInfoProto
+        if table_info:
+            self._table = table_info
+        elif project_id and dataset_id and table_id:
+            self._table = TableInfo(project_id, dataset_id, table_id)
+        elif full_table_name:
+            try:
+                project_id, dataset_id, table_id = full_table_name.split("_")
+                self._table = TableInfo(project_id, dataset_id, table_id)
+            except Exception as e:
+                raise TableIdentifierError(
+                    project_id, dataset_id, table_id, full_table_name, table_info
+                ) from e
+        else:
+            raise TableIdentifierError(
+                project_id, dataset_id, table_id, full_table_name, table_info
+            )
+
+        super().__init__(*args, **kwargs)
+
     @property
     @abstractmethod
-    def full_table_id(self) -> str: ...
+    def full_table_id(self) -> str:
+        return self._table.full_table_id
 
     @override
     @abstractmethod
@@ -269,11 +328,9 @@ class UtcVersionStampedTableName(VersionStampedTableName):
 
     def __init__(
         self,
-        table_info: HasTableInfoProto,
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[_VersionStampedTableIdKwargs],
     ) -> None:
-        self._table: HasTableInfoProto = table_info
         super().__init__(*args, **kwargs)
 
     @override
@@ -308,16 +365,16 @@ class UtcVersionStampedTableName(VersionStampedTableName):
 
 
 class StagingTableName(VersionStampedTableName):
-    _default_suffix: ClassVar[str] = "staging"
+    """Wrap a table name with `_staging` suffix"""
+
+    _default_suffix: ClassVar[str] = "_staging"
 
     def __init__(
         self,
-        table_info: HasTableInfoProto,
         staging_suffix: str | None = None,
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[_VersionStampedTableIdKwargs],
     ) -> None:
-        self._table: HasTableInfoProto = table_info
         self._suffix: str = staging_suffix or self._default_suffix
         super().__init__(*args, **kwargs)
 
@@ -340,13 +397,31 @@ class StagingTableName(VersionStampedTableName):
     @override
     @classmethod
     def stamp(cls, name: str) -> str:
-        return f"{name}_{cls._default_suffix}"
+        return f"{name}{cls._default_suffix}"
 
     @override
     @classmethod
     def unstamp(cls, name: str) -> str:
+        """Remove the suffix.
+
+        ```pycon
+        >>> t = "foo.bar.baz_staging"
+        >>> StagingTableName.unstamp(t)
+        'foo.bar.baz'
+        >>> StagingTableName.unstamp("foo.bar.baz")
+        'foo.bar.baz'
+
+        ```
+
+        """
         return name.removesuffix(cls._default_suffix)
 
     @override
     def _validate(self, *args: Any, **kwargs: Any) -> None:
         return super()._validate(*args, **kwargs)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    _ = doctest.testmod()

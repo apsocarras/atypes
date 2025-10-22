@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from ._types import SequenceNotStr as Sequence
-from ._types import _VersionStampErrorArgs
+from ._types import SupportsStr, _VersionStampErrorArgs
 
 
 class ValidationError(BaseException):
@@ -37,4 +37,12 @@ class HeaderAndValuesError(ValidationError):
         self, headers: Sequence[str], values: Sequence[str], *args: Any, **kwargs: Any
     ) -> None:
         msg = f"Length mismatch: 'headers'={len(headers)}, 'values'={len(values)}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class TableIdentifierError(ValidationError):
+    """Failed to construct a valid table name based on the inputs"""
+
+    def __init__(self, *args: SupportsStr, **kwargs: str) -> None:
+        msg = f"Failed to construct table id from: {', '.join(str(s) for s in args)}"
         super().__init__(msg, *args, **kwargs)

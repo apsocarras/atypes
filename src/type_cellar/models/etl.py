@@ -1,4 +1,5 @@
 """Common types used when writing data pipelines"""
+
 from __future__ import annotations
 
 import attr
