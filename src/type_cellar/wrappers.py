@@ -20,7 +20,7 @@ from typing import (
 )
 
 import attr
-from typing_extensions import Sentinel, Unpack, override
+from typing_extensions import NotRequired, Sentinel, Unpack, override
 
 from type_cellar._types import HasTableInfoProto
 
@@ -226,12 +226,12 @@ class TableInfo:
         return f"{self.project_id}.{self.dataset_id}.{self.table_id}"
 
 
-class _VersionStampedTableIdKwargs(TypedDict):
-    table_info: HasTableInfoProto | None
-    project_id: str | None
-    dataset_id: str | None
-    table_id: str | None
-    full_table_name: str | None
+class _VersionStampedTableIdKwargs(TypedDict, total=False):
+    table_info: NotRequired[HasTableInfoProto | None]
+    project_id: NotRequired[str | None]
+    dataset_id: NotRequired[str | None]
+    table_id: NotRequired[str | None]
+    full_table_name: NotRequired[str | None]
 
 
 class VersionStampedTableName(VersionStampedName, ABC):
