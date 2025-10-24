@@ -271,12 +271,28 @@ class VersionStampedTableName(VersionStampedName, ABC):
     @property
     @abstractmethod
     def full_table_id(self) -> str:
+        """Full table id of the BASE table name (unstamped)"""
         return self._table.full_table_id
 
     @override
     @abstractmethod
     def __str__(self) -> str:
         return self.full_table_id
+
+    @property
+    def project_id(self) -> str:
+        """Access `project_id` of the table"""
+        return self._table.project_id
+
+    @property
+    def dataset_id(self) -> str:
+        """Access `dataset_id` of the table"""
+        return self._table.dataset_id
+
+    @property
+    def table_id(self) -> str:
+        """Access `table_id` of the table"""
+        return self._table.table_id
 
 
 _T = TypeVar("_T", bound=HasTableInfoProto)
