@@ -46,3 +46,19 @@ class TableIdentifierError(ValidationError):
     def __init__(self, *args: SupportsStr, **kwargs: str) -> None:
         msg = f"Failed to construct table id from: {', '.join(str(s) for s in args)}"
         super().__init__(msg, *args, **kwargs)
+
+
+class MissingCompositeKeyColsError(ValidationError):
+    """Can't form composite key because certain columns are missing"""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        msg = f"Can't form composite key: {', '.join(f'{k}={v}' for k, v in kwargs.items())}"
+        super().__init__(msg)
+
+
+class HasColumnError(ValidationError):
+    """Column already present in the row"""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        msg = f"Already has primary key col: {', '.join(f'{k}={v}' for k, v in kwargs.items())}"
+        super().__init__(msg)
