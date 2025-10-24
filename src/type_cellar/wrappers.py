@@ -255,7 +255,7 @@ class VersionStampedTableName(VersionStampedName, ABC):
             self._table = TableInfo(project_id, dataset_id, table_id)
         elif full_table_name:
             try:
-                project_id, dataset_id, table_id = full_table_name.split("_")
+                project_id, dataset_id, table_id = full_table_name.split(".")
                 self._table = TableInfo(project_id, dataset_id, table_id)
             except Exception as e:
                 raise TableIdentifierError(
